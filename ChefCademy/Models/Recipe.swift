@@ -7,42 +7,31 @@
 
 import Foundation
 
-// Represents a recipe with main information, ingredients, and directions
 struct Recipe: Identifiable {
-    var id = UUID() // unique ID
-    
-    // The primary information about the recipe (e.g., name, description, author, etc.)
+    var id = UUID()
     var mainInformation: MainInformation
-    
-    // List of ingredients required for the recipe
     var ingredients: [Ingredient]
-    
-    // List of directions or steps to follow for the recipe
     var directions: [Direction]
     
-    // Custom initializer that allows setting all properties
-    init(mainInformation: MainInformation, ingredients: [Ingredient], directions: [Direction]) {
-        self.mainInformation = mainInformation
-        self.ingredients = ingredients
-        self.directions = directions
-    }
-    
-    // Default initializer, creates an empty recipe with no ingredients or directions
     init() {
         self.init(mainInformation: MainInformation(name: "", description: "", author: "", category: .breakfast),
                   ingredients: [],
                   directions: [])
     }
+    
+    init(mainInformation: MainInformation, ingredients:[Ingredient], directions:[Direction]) {
+        self.mainInformation = mainInformation
+        self.ingredients = ingredients
+        self.directions = directions
+    }
 }
 
-// Represents the main information of a recipe, including its name, description, author, and category
 struct MainInformation {
-    var name: String           // The name of the recipe
-    var description: String     // A short description of the recipe
-    var author: String          // The author or creator of the recipe
-    var category: Category      // The category of the recipe (e.g., breakfast, lunch, etc.)
-
-    // Enum representing the category/type of the recipe
+    var name: String
+    var description: String
+    var author: String
+    var category: Category
+    
     enum Category: String, CaseIterable {
         case breakfast = "Breakfast"
         case lunch = "Lunch"
@@ -51,54 +40,41 @@ struct MainInformation {
     }
 }
 
-// Represents an ingredient used in the recipe, including its name, quantity, and unit of measurement
-struct Ingredient {
-    var name: String            // The name of the ingredient (e.g., "Sugar")
-    var quantity: Double        // The quantity of the ingredient (e.g., 2.0)
-    var unit: Unit              // The unit of measurement for the ingredient (e.g., "Cups")
+struct Direction {
+    var description: String
+    var isOptional: Bool
+}
 
-    // Computed property that generates a user-friendly description of the ingredient
-    var description: String {
-        // Format the quantity to remove any trailing zeros (e.g., 1.0 becomes 1)
-        let formattedQuantity = String(format: "%g", quantity)
+struct Ingredient {
+    var name: String
+    var quantity: Double
+    var unit: Unit
         
-        // Handle the description based on the unit type
+    var description: String {
+        let formattedQuantity = String(format: "%g", quantity)
         switch unit {
         case .none:
-            // If there's no unit (e.g., for items that are counted individually)
-            let formattedName = quantity == 1 ? name : "\(name)s" // Pluralize the name if needed
+            let formattedName = quantity == 1 ? name : "\(name)s"
             return "\(formattedQuantity) \(formattedName)"
-            
         default:
-            // For other units, return the quantity with the unit's singular or plural form
             if quantity == 1 {
                 return "1 \(unit.singularName) \(name)"
             } else {
-                return "\(formattedQuantity) \(unit.rawValue) \(name)"
+                return "\(formattedQuantity) \(unit.rawValue) \(name) "
             }
         }
     }
-
-    // Enum representing the unit of measurement for an ingredient (e.g., grams, ounces, etc.)
+    
     enum Unit: String, CaseIterable {
         case oz = "Ounces"
         case g = "Grams"
         case cups = "Cups"
         case tbs = "Tablespoons"
         case tsp = "Teaspoons"
-        case none = "No Units"  // For ingredients that don't have a unit (e.g., "Apples")
-
-        // Computed property that returns the singular form of the unit (e.g., "Cup" instead of "Cups")
-        var singularName: String {
-            return String(rawValue.dropLast())
-        }
+        case none = "No units"
+        
+        var singularName: String { String(rawValue.dropLast()) }
     }
-}
-
-// Represents a step or instruction in the recipe, including a description and whether it is optional
-struct Direction {
-    var description: String     // The description of the direction/step (e.g., "Mix all ingredients")
-    var isOptional: Bool        // Indicates whether the direction is optional (e.g., "Garnish with parsley")
 }
 
 extension Recipe {
